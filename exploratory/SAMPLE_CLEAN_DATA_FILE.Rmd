@@ -1,0 +1,700 @@
+---
+title: "BEACH Inventory - Clean data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+##-------------- 
+# **************************************************************************** #
+# ***************                Project Overview              *************** #
+# **************************************************************************** #
+
+# Author:      Ke Xu - Modified by Hailey Ballard
+# Date:        Sept 28, 2020 
+# Modify:      Jan 29, 2021
+# IRB:         The Breastfeeding and EArly Child Health (BEACH) study (IRB201601034)
+
+# **************************************************************************** #
+# ***************                Description                   *************** #
+# **************************************************************************** #
+
+# PLAN: Clean data from imported RedCap records
+# **************************************************************************** #
+# ***************         Table of Contents                    *************** #
+# **************************************************************************** #
+
+# Core Variables
+# [X] test_id 
+# [X] mom3t_prepreg_bmi
+# [X] inv_delivery_type
+
+core_vars=c("test_id", "mom3t_prepreg_bmi", "inv_delivery_type")
+
+# Group Variables
+# [X] beach_part_drop_out
+# [X] beach_study_complete
+
+group_vars=c("beach_part_drop_out", "beach_study_complete")
+
+# Table 1 Baseline Information
+# [X] beach_prescreen_survey_complete
+# [X] phonescreen_followup_complete
+# [X] beach_part_consent
+# [X] beach_study_complete
+# [X] beach_part_drop_out
+
+table01_vars=c("beach_prescreen_survey_complete", "phonescreen_followup_complete", "beach_part_consent")
+
+# Table 2 - Contact 
+# [X] exitsurvey_learnedstudy___1
+# [X] exitsurvey_learnedstudy___2
+# [X] exitsurvey_learnedstudy___3
+# [X] exitsurvey_learnedstudy___4
+# [X] exitsurvey_learnedstudy___5
+# [X] exitsurvey_learnedstudy___6
+# [X] beach_see_flyer
+# [X] beach_ufhealth_clinic
+# [X] exitsurvey_futurestudies
+# [X] beach_learn_about_study
+
+table02_vars=c("exitsurvey_learnedstudy___1", "exitsurvey_learnedstudy___2",
+               "exitsurvey_learnedstudy___3", "exitsurvey_learnedstudy___4",
+               "exitsurvey_learnedstudy___5", "exitsurvey_learnedstudy___6",
+               "beach_see_flyer", "beach_ufhealth_clinic", "exitsurvey_futurestudies",
+               "beach_learn_about_study")
+
+# Table 3 - Active Participants
+# [X] inv_samples
+# [X] inv_ehr
+# [X] inv_studies
+# [X] inv_delivery_location
+# [X] part_address	
+ 
+table03_vars=c("inv_samples", "inv_ehr", "inv_studies","inv_delivery_location", "participant_contact_information_complete")
+
+# Table 4 - Completed Participants
+# [X] inv_samples
+# [X] inv_ehr
+# [X] inv_studies
+# [X] inv_delivery_location
+# [X] participant_contact_information_complete	
+ 
+table04_vars=c("inv_samples", "inv_ehr", "inv_studies","inv_delivery_location", "participant_contact_information_complete")
+
+# Table 5 - Dropped Participants
+# [X] inv_samples
+# [X] inv_ehr
+# [X] inv_studies
+# [X] inv_delivery_location
+# [X] participant_contact_information_complete
+ 
+table05_vars=c("inv_samples", "inv_ehr", "inv_studies","inv_delivery_location", "participant_contact_information_complete")
+
+# Table 06 - Biological Samples at 3rd Trimester
+# [X] mom3t_crc_blood_time
+# [X] mom3t_crc_urine_time
+# [X] mom3t_crc_stool_time
+# [X] mom3t_crc_vswab_time
+# [X] mom3t_crc_saliva_time
+# [X] mompostnat_crc_blood_time
+# [X] mompostnat_crc_urine_time
+# [X] mompostnat_crc_milk_time
+# [X] mompostnat_crc_stool_time
+# [X] mompostnat_crc_vswab_time (not collected at 2 week visit)
+# [X] mompostnat_crc_saliva_time
+# [X] infant_crc_blood_time
+# [X] infant_crc_stool_time
+# [X] infant_crc_saliva_time
+# [X] infant_crc_urine_time
+
+table06_vars=c("mom3t_crc_blood_time", "mom3t_crc_urine_time", "mom3t_crc_stool_time",
+               "mom3t_crc_vswab_time", "mom3t_crc_saliva_time", "mompostnat_crc_blood_time",
+               "mompostnat_crc_urine_time", "mompostnat_crc_milk_time",
+               "mompostnat_crc_stool_time", "mompostnat_crc_vswab_time",
+               "mompostnat_crc_saliva_time", "infant_crc_blood_time", "infant_crc_stool_time",
+               "infant_crc_urine_time")
+
+# Table 07 - Demographics
+# [X] mom_ethnicity_nih
+# [X] infant_ethnicity_nih
+# [X] maternal_race_nih___1
+# [X] maternal_race_nih___2
+# [X] maternal_race_nih___4
+# [X] maternal_race_nih___5
+# [X] maternal_race_nih___6
+# [X] infant_race_nih___1
+# [X] infant_race_nih___2
+# [X] infant_race_nih___3
+# [X] infant_race_nih___4
+# [X] infant_race_nih___5
+# [X] infant_race_nih___6
+# [X] infant_sex_nih
+
+table07_vars=c("mom_ethnicity_nih", "infant_ethnicity_nih", "maternal_race_nih___1", "maternal_race_nih___2", "maternal_race_nih___3", "maternal_race_nih___4", "maternal_race_nih___5", "maternal_race_nih___6", "infant_race_nih___1", "infant_race_nih___2", "infant_race_nih___3", "infant_race_nih___4", "infant_race_nih___5", "infant_race_nih___6", "infant_sex_nih")
+
+# Tables 8-10 - Biological Specimen Collection at 2 Week, 2 Month, and 12 Month Visits
+# [X] mompostnat_crc_visit
+# [X] mompostnat_crc_blood_time
+# [X] mompostnat_crc_urine_time
+# [X] mompostnat_crc_milk_time
+# [X] mompostnat_crc_stool_time
+# [X] mompostnat_crc_saliva_time
+# [X] infant_crc_urine_time	
+# [X] infant_crc_blood_time
+# [X] infant_crc_stool_time
+# [X] infant_crc_saliva_time
+
+tables08_10_vars=c("mompostnat_crc_visit", "mompostnat_crc_blood_time",
+               "mompostnat_crc_urine_time", "mompostnat_crc_milk_time",
+               "mompostnat_crc_stool_time","mompostnat_crc_saliva_time",
+               "infant_crc_urine_time","infant_crc_blood_time", 
+               "infant_crc_stool_time", "infant_crc_saliva_time")
+
+# Table 11 - North Florida Medical Release Forms
+# [X] beach_prenat_medrelease_pdf1
+
+table11_vars=c("beach_prenat_medrelease_pdf1")
+  
+```
+
+```{r setup, include=FALSE,message=FALSE,warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+library(tidyverse)
+library(questionr)
+source("~/BEACH-analysis/code/variables.R")
+load("~/BEACH-analysis/data/data_raw.RData")
+```
+
+```{r, echo=FALSE}
+
+new_dat_2=data_raw[grepl("^BLS", data_raw$test_id), ]
+
+new_dat=new_dat_2[grepl("^baseline", new_dat_2$redcap_event_name), ]
+
+# Drop rows with new participants and one phone screen fail
+
+new_dat=new_dat%>%
+  filter(test_id != "BLS057A",
+         test_id != "BLS094A",
+         test_id != "BLS097A",
+         test_id != "BLS098A",
+         test_id != "BLS099A", 
+         test_id != "BLS100A")
+#
+
+# Collect pre-preg BMI
+bmi_dat=new_dat_2[grepl("^third", new_dat_2$redcap_event_name), ]
+
+bmi_dat=bmi_dat[grepl("^", bmi_dat$mom3t_prepreg_bmi), ]
+
+bmi_data_new=bmi_dat$mom3t_prepreg_bmi
+
+new_dat=new_dat%>%
+  mutate(prepreg_bmi=bmi_data_new)
+
+### Mutate Biological Collection Data ###
+
+# 3rd Trimester CRC Visit
+thirdtri_blood=bmi_dat$mom3t_crc_blood_time
+thirdtri_urine=bmi_dat$mom3t_crc_urine_time
+thirdtri_stool=bmi_dat$mom3t_crc_stool_time
+thirdtri_vswab=bmi_dat$mom3t_crc_vswab_time
+thirdtri_saliva=bmi_dat$mom3t_crc_saliva_time
+
+new_dat=new_dat%>%
+  mutate(third_tri_blood=thirdtri_blood,
+         third_tri_urine=thirdtri_urine,
+         third_tri_stool=thirdtri_stool,
+         third_tri_vswab=thirdtri_vswab,
+         third_tri_saliva=thirdtri_saliva)
+table06_new_vars=c("third_tri_blood", "third_tri_urine", "third_tri_stool",
+                   "third_tri_vswab", "third_tri_saliva")
+
+
+
+# Select data 
+new_dat=new_dat%>%
+  select(core_vars,
+         group_vars,
+         prepreg_bmi,
+         table01_vars,
+         table02_vars,
+         table03_vars,
+         table04_vars,
+         table05_vars,
+         table06_new_vars,
+         table07_vars,
+         table11_vars)
+
+### Core Variables ###
+
+# [X] inv_delivery_type
+new_dat=new_dat%>%
+  mutate(inv_delivery_type=recode_factor(inv_delivery_type,
+                                         "1" = "Vaginally",
+                                         "2" = "Casesarean-Section",                                                                     .missing = "Missing"))
+bmi_raw=new_dat$prepreg_bmi
+new_dat=new_dat%>%
+  mutate(bmi_raw_data=bmi_raw)
+
+# [X] prepreg_bmi
+new_dat=new_dat%>%
+  mutate_at(vars(prepreg_bmi), function(x) case_when(
+                                     x <27 ~ "NW",
+                                     between(x, 27,28) ~ "Overweight",
+                                     x > 28 ~ "Ob"))
+
+new_dat=new_dat%>%
+  mutate()
+# Create BMI category
+bmi=new_dat$prepreg_bmi
+new_dat=new_dat%>%
+  mutate(bmi_data=bmi)
+
+# Create delivery type category
+delivery_type=new_dat$inv_delivery_type
+new_dat=new_dat%>%
+  mutate(delivery_data=delivery_type)
+
+#make individual table with BMI
+
+# Combine pregreg BMI with delivery type #
+
+new_dat=new_dat%>%
+  unite(study_group, prepreg_bmi,inv_delivery_type)
+
+week2_study_group=new_dat$study_group
+
+# Group study_group into 4 categories
+
+new_dat=new_dat%>%
+  mutate(study_group=recode_factor(study_group,
+                                   "NW_Vaginally" = "NW/VG",
+                                   "NA_Vaginally" = "Missing",
+                                   "Ob_Casesarean-Section" = "Ob/CS",
+                                   "NW_Missing" = "Missing",
+                                   "Ob_Vaginally" = "Ob/VG",
+                                   "NW_Casesarean-Section" = "NW/CS",
+                                   "Overweight_Missing" = "Missing",
+                                   "Ob_Missing" = "Missing",
+                                   "Overweight_Casesarean-Section" = "OW/CS",
+                                   "Overweight_Vaginally" = "OW/VG"))
+
+### Group Variables ###
+
+# [X] beach_part_drop_out
+new_dat=new_dat%>%
+  mutate(beach_part_drop_out=recode_factor(beach_part_drop_out,
+                                           "0" = "No",
+                                           "1" = "Yes",
+                                           .missing = "Missing"))
+# [X] beach_study_complete
+new_dat=new_dat%>%
+  mutate(beach_study_complete=recode_factor(beach_study_complete,
+                                            "0" = "No",
+                                            "1" = "Yes",
+                                            .missing = "Missing"))
+
+
+### Table 01 - Basic Info ###
+
+# [X] beach_prescreen_survey_complete
+new_dat=new_dat%>%
+  mutate(beach_prescreen_survey_complete=recode_factor(beach_prescreen_survey_complete,
+                                                       "0" = "Incomplete",
+                                                       "1" = "Unverified",
+                                                       "2" = "Complete",
+                                                       .missing = "Missing"))
+# [X] phonescreen_followup_complete
+new_dat=new_dat%>%
+  mutate(phonescreen_followup_complete=recode_factor(phonescreen_followup_complete,
+                                                       "0" = "Incomplete",
+                                                       "1" = "Unverified",
+                                                       "2" = "Complete",
+                                                       .missing = "Missing"))
+
+# [X] beach_part_consent
+new_dat=new_dat%>%
+  mutate(beach_part_consent=recode_factor(beach_part_consent,
+                                                       "0" = "No",
+                                                       "1" = "Yes",
+                                                       .missing = "Missing"))
+
+
+### Table 2 - Contact ### 
+
+# [X] exitsurvey_learnedstudy___X
+# Combine 6 choices
+new_dat=new_dat%>%
+  unite(exit_learn_study, exitsurvey_learnedstudy___1, exitsurvey_learnedstudy___2, 
+        exitsurvey_learnedstudy___3, exitsurvey_learnedstudy___4,
+        exitsurvey_learnedstudy___5, exitsurvey_learnedstudy___6)
+
+# Recode combined variable
+new_dat=new_dat%>%
+  mutate(exit_learn_study=recode_factor(exit_learn_study,
+                                        "0_0_0_0_0_0" = "Missing",
+                                        "1_0_0_0_0_0" = "Doctor Recommendation",
+                                        "0_1_0_0_0_0" = "Telephone",
+                                        "0_0_1_0_0_0" = "Online",
+                                        "0_0_0_1_0_0" = "Flyer",
+                                        "0_0_0_0_1_0" = "Friend/Family",
+                                        "0_0_0_0_0_1" = "Other",
+                                        "0_1_0_0_0_1" = "Multiple",
+                                        "0_0_0_0_1_1" = "Multiple",
+                                        "1_0_0_1_0_0" = "Multiple",
+                                        "0_0_1_0_0_1" = "Multiple",
+                                        .missing = "Missing"))
+
+# [X] beach_see_flyer
+
+
+# Combine 3 flyer variables
+new_dat=new_dat%>%
+  unite(flyer_data_one, beach_see_flyer, beach_learn_about_study)
+new_dat=new_dat%>%
+  unite(flyer_data, flyer_data_one, beach_ufhealth_clinic)
+
+# Recode flyer_data responses
+new_dat=new_dat%>%
+  mutate(flyer_data=recode_factor(flyer_data,
+                                  "NA_NA_NA" = "Missing",
+                                  "NA_1_NA" = "Flyer",
+                                  "2_1_NA" = "Flyer",
+                                  "NA_3_NA" = "Social Media",
+                                  "1_1_1" = "Flyer - UF Health Clinic: Spring Hill",
+                                  "1_1_5" = "Flyer - UF Health Clinic: Other",
+                                  "1_1_4" = "Flyer - UF Health Clinic: Med Plaza",
+                                  "NA_5_NA" = "Other"))
+
+# [X] exitsurvey_futurestudies
+new_dat=new_dat%>%
+  mutate(exitsurvey_futurestudies=recode_factor(exitsurvey_futurestudies,
+                                                "1" = "Yes",
+                                                "2" = "No",
+                                                .missing = "Missing"))
+
+### Tables 3,4, & 5 ###
+
+# [X] inv_samples	
+new_dat=new_dat%>%
+  mutate(inv_samples=recode_factor(inv_samples,
+                                   "1" = "Yes",
+                                   "2" = "No",
+                                   .missing = "Missing"))
+# [X] inv_ehr	
+new_dat=new_dat%>%
+  mutate(inv_ehr=recode_factor(inv_ehr	,
+                               "1" = "Yes",
+                               "2" = "No",
+                               .missing = "Missing"))	
+
+# [X] inv_studies	
+new_dat=new_dat%>%
+  mutate(inv_studies=recode_factor(inv_studies,
+                                   "1" = "Yes",
+                                   "2" = "No",
+                                   .missing = "Missing"))
+# [X] inv_delivery_location
+new_dat=new_dat%>%
+  mutate(inv_delivery_location=recode_factor(inv_delivery_location,
+                                             "1" = "Shands",
+                                             "2" = "North Florida",
+                                             "3" = "Home",
+                                             "4" = "Doula Center",
+                                             .missing = "Missing")) 
+
+
+# [X] participant_contact_information_complete
+new_dat=new_dat%>%
+  mutate(participant_contact_information_complete=recode_factor(participant_contact_information_complete,
+                                                                "0" = "Incomplete",
+                                                                "1" = "Unverified",
+                                                                "2" = "Complete",
+                                                                .missing = "Missing"))
+
+# Table 6 - Biological Samples
+
+# [X] third_tri_blood
+new_dat=new_dat%>%
+  mutate(third_tri_blood = ifelse(third_tri_blood > 00:00, "Collected", third_tri_blood))%>%
+  mutate(third_tri_blood=recode_factor(third_tri_blood,
+                                       .missing = "Not Collected"))
+# [X] third_tri_urine
+new_dat=new_dat%>%
+  mutate(third_tri_urine = ifelse(third_tri_urine > 00:00, "Collected", third_tri_urine))%>%
+  mutate(third_tri_urine=recode_factor(third_tri_urine,
+                                       .missing = "Not Collected"))
+# [X] third_tri_stool
+new_dat=new_dat%>%
+  mutate(third_tri_stool = ifelse(third_tri_stool > 00:00, "Collected", third_tri_stool))%>%
+  mutate(third_tri_stool=recode_factor(third_tri_stool,
+                                       .missing = "Not Collected"))
+# [X] third_tri_vswab
+new_dat=new_dat%>%
+  mutate(third_tri_vswab = ifelse(third_tri_vswab > 00:00, "Collected", third_tri_vswab))%>%
+  mutate(third_tri_vswab=recode_factor(third_tri_vswab,
+                                       .missing = "Not Collected"))
+# [X] third_tri_saliva
+new_dat=new_dat%>%
+  mutate(third_tri_saliva = ifelse(third_tri_saliva > 00:00, "Collected", third_tri_saliva))%>%
+  mutate(third_tri_saliva=recode_factor(third_tri_saliva,
+                                       .missing = "Not Collected"))
+
+# Table 7 - Demographics
+
+# [X] mom_ethnicity_nih
+new_dat=new_dat%>%
+  mutate(mom_ethnicity_nih=recode_factor(mom_ethnicity_nih,
+                                        "1" = "Not Hispanic/Latino",
+                                        "2" = "Hispanic/Latino",
+                                        "3" = "Missing",
+                                        .missing = "Missing"))
+
+# [X] infant_ethnicity_nih
+new_dat=new_dat%>%
+  mutate(infant_ethnicity_nih=recode_factor(infant_ethnicity_nih,
+                                           "1" = "Not Hispanic/Latino",
+                                           "2" = "Hispanic/Latino",
+                                           "3" = "Missing",
+                                           .missing = "Missing"))
+# [X] maternal_race_nih
+# combine 6 maternal race choices
+new_dat=new_dat%>%
+  unite(maternal_race, maternal_race_nih___1, maternal_race_nih___2, maternal_race_nih___3,
+        maternal_race_nih___4, maternal_race_nih___5, maternal_race_nih___6)
+  
+# Recode maternal race variables 
+new_dat=new_dat%>%
+  mutate(maternal_race=recode_factor(maternal_race,
+                                     "1_0_0_0_0_0" = "American Indian",
+                                     "0_1_0_0_0_0" = "Asian",
+                                     "0_0_1_0_0_0" = "Black",
+                                     "0_0_0_1_0_0" = "Pacific Islander",
+                                     "0_0_0_0_1_0" = "White",
+                                     "0_0_0_0_0_1" = "Missing",
+                                     "0_0_1_0_1_0" =  "More than one",
+                                     "1_0_0_1_0_0" = "More than one",
+                                     "1_0_1_1_0_0" = "More than one",
+                                     "0_1_1_0_0_0" = "More than one",
+                                     "0_1_0_0_1_0" = "More than one",
+                                     .missing = "Missing"))
+  
+# [X] infant_race_nih
+# combine 6 infant = race choices
+new_dat=new_dat%>%
+  unite(infant_race, infant_race_nih___1, infant_race_nih___2, infant_race_nih___3,
+        infant_race_nih___4, infant_race_nih___5, infant_race_nih___6)
+
+# Recode infant race variables 
+new_dat=new_dat%>%
+  mutate(infant_race=recode_factor(infant_race,
+                                  "1_0_0_0_0_0" = "American Indian",
+                                  "0_1_0_0_0_0" = "Asian",
+                                  "0_0_1_0_0_0" = "Black",
+                                  "0_0_0_1_0_0" = "Pacific Islander",
+                                  "0_0_0_0_1_0" = "White",
+                                  "0_0_0_0_0_1" = "Missing",
+                                  "0_0_1_0_1_0" =  "More than one",
+                                  "1_0_0_1_0_0" = "More than one",
+                                  "1_0_1_1_0_0" = "More than one",
+                                  "0_1_1_0_0_0" = "More than one",
+                                  "1_0_0_0_1_0" = "More than one",
+                                  "0_1_0_0_1_0" = "More than one",
+                                  .missing = "Missing"))
+
+# [X] infant_sex_nih
+baseline_cleaned=new_dat%>%
+  mutate(infant_sex_nih=recode_factor(infant_sex_nih,
+                                      "1" = "Male",
+                                      "2" = "Female",
+                                      "3" = "Missing",
+                                      .missing = "Missing"))
+
+### Table 8 - Biological Specimen Collection at 2 Week Visit
+
+# 2-week CRC visit - Create new dataset 
+crc_2week_data=new_dat_2[grepl("^1", new_dat_2$mompostnat_crc_visit), ]
+
+# Save 2 week dataset
+crc_2week_data=crc_2week_data%>%
+  select(core_vars,
+         tables08_10_vars)
+
+# [X] mompostnat_crc_blood_time
+crc_2week_data=crc_2week_data%>%
+  mutate(mompostnat_crc_blood_time = ifelse(mompostnat_crc_blood_time > 00:00, "Collected", mompostnat_crc_blood_time))%>%
+  mutate(mompostnat_crc_blood_time=recode_factor(mompostnat_crc_blood_time,
+                                                 .missing = "Not Collected"))
+# [X] mompostnat_crc_urine_time
+crc_2week_data=crc_2week_data%>%
+  mutate(mompostnat_crc_urine_time = ifelse(mompostnat_crc_urine_time > 00:00, "Collected", mompostnat_crc_urine_time))%>%
+  mutate(mompostnat_crc_urine_time=recode_factor(mompostnat_crc_urine_time,
+                                                 .missing = "Not Collected"))
+# [X] mompostnat_crc_milk_time
+crc_2week_data=crc_2week_data%>%
+  mutate(mompostnat_crc_milk_time = ifelse(mompostnat_crc_milk_time > 00:00, "Collected", mompostnat_crc_milk_time))%>%
+  mutate(mompostnat_crc_milk_time=recode_factor(mompostnat_crc_milk_time,
+                                                .missing = "Not Collected"))
+# [X] mompostnat_crc_stool_time
+crc_2week_data=crc_2week_data%>%
+  mutate(mompostnat_crc_stool_time = ifelse(mompostnat_crc_stool_time > 00:00, "Collected", mompostnat_crc_stool_time))%>%
+  mutate(mompostnat_crc_stool_time=recode_factor(mompostnat_crc_stool_time,
+                                                 .missing = "Not Collected"))
+# [X] mompostnat_crc_saliva_time
+crc_2week_data=crc_2week_data%>%
+  mutate(mompostnat_crc_saliva_time = ifelse(mompostnat_crc_saliva_time > 00:00, "Collected", mompostnat_crc_saliva_time))%>%
+  mutate(mompostnat_crc_saliva_time=recode_factor(mompostnat_crc_saliva_time,
+                                                  .missing = "Not Collected"))
+# [X] infant_crc_urine_time
+crc_2week_data=crc_2week_data%>%
+  mutate(infant_crc_urine_time = ifelse(infant_crc_urine_time > 00:00, "Collected", infant_crc_urine_time))%>%
+  mutate(infant_crc_urine_time=recode_factor(infant_crc_urine_time,
+                                             .missing = "Not Collected"))
+# [X] infant_crc_blood_time
+crc_2week_data=crc_2week_data%>%
+  mutate(infant_crc_blood_time = ifelse(infant_crc_blood_time > 00:00, "Collected", infant_crc_blood_time))%>%
+  mutate(infant_crc_blood_time=recode_factor(infant_crc_blood_time,
+                                             .missing = "Not Collected"))
+# [X] infant_crc_stool_time
+crc_2week_data=crc_2week_data%>%
+  mutate(infant_crc_stool_time = ifelse(infant_crc_stool_time > 00:00, "Collected", infant_crc_stool_time))%>%
+  mutate(infant_crc_stool_time=recode_factor(infant_crc_stool_time,
+                                             .missing = "Not Collected"))
+# [X] infant_crc_saliva_time
+crc_2week_data=crc_2week_data%>%
+  mutate(infant_crc_saliva_time = ifelse(infant_crc_saliva_time > 00:00, "Collected", infant_crc_saliva_time))%>%
+  mutate(infant_crc_saliva_time=recode_factor(infant_crc_saliva_time,
+                                              .missing = "Not Collected"))
+
+# 2-Month CRC visit - Create new dataset 
+crc_2month_data=new_dat_2[grepl("^2", new_dat_2$mompostnat_crc_visit), ]
+
+# Save 2 month dataset
+crc_2month_data=crc_2month_data%>%
+  select(core_vars,
+         tables08_10_vars)
+
+# [X] mompostnat_crc_blood_time
+crc_2month_data=crc_2month_data%>%
+  mutate(mompostnat_crc_blood_time = ifelse(mompostnat_crc_blood_time > 00:00, "Collected", mompostnat_crc_blood_time))%>%
+  mutate(mompostnat_crc_blood_time=recode_factor(mompostnat_crc_blood_time,
+                                                 .missing = "Not Collected"))
+# [X] mompostnat_crc_urine_time
+crc_2month_data=crc_2month_data%>%
+  mutate(mompostnat_crc_urine_time = ifelse(mompostnat_crc_urine_time > 00:00, "Collected", mompostnat_crc_urine_time))%>%
+  mutate(mompostnat_crc_urine_time=recode_factor(mompostnat_crc_urine_time,
+                                                 .missing = "Not Collected"))
+# [X] mompostnat_crc_milk_time
+crc_2month_data=crc_2month_data%>%
+  mutate(mompostnat_crc_milk_time = ifelse(mompostnat_crc_milk_time > 00:00, "Collected", mompostnat_crc_milk_time))%>%
+  mutate(mompostnat_crc_milk_time=recode_factor(mompostnat_crc_milk_time,
+                                                .missing = "Not Collected"))
+# [X] mompostnat_crc_stool_time
+crc_2month_data=crc_2month_data%>%
+  mutate(mompostnat_crc_stool_time = ifelse(mompostnat_crc_stool_time > 00:00, "Collected", mompostnat_crc_stool_time))%>%
+  mutate(mompostnat_crc_stool_time=recode_factor(mompostnat_crc_stool_time,
+                                                 .missing = "Not Collected"))
+# [X] mompostnat_crc_saliva_time
+crc_2month_data=crc_2month_data%>%
+  mutate(mompostnat_crc_saliva_time = ifelse(mompostnat_crc_saliva_time > 00:00, "Collected", mompostnat_crc_saliva_time))%>%
+  mutate(mompostnat_crc_saliva_time=recode_factor(mompostnat_crc_saliva_time,
+                                                  .missing = "Not Collected"))
+# [X] infant_crc_urine_time
+crc_2month_data=crc_2month_data%>%
+  mutate(infant_crc_urine_time = ifelse(infant_crc_urine_time > 00:00, "Collected", infant_crc_urine_time))%>%
+  mutate(infant_crc_urine_time=recode_factor(infant_crc_urine_time,
+                                             .missing = "Not Collected"))
+# [X] infant_crc_blood_time
+crc_2month_data=crc_2month_data%>%
+  mutate(infant_crc_blood_time = ifelse(infant_crc_blood_time > 00:00, "Collected", infant_crc_blood_time))%>%
+  mutate(infant_crc_blood_time=recode_factor(infant_crc_blood_time,
+                                             .missing = "Not Collected"))
+# [X] infant_crc_stool_time
+crc_2month_data=crc_2month_data%>%
+  mutate(infant_crc_stool_time = ifelse(infant_crc_stool_time > 00:00, "Collected", infant_crc_stool_time))%>%
+  mutate(infant_crc_stool_time=recode_factor(infant_crc_stool_time,
+                                             .missing = "Not Collected"))
+# [X] infant_crc_saliva_time
+crc_2month_data=crc_2month_data%>%
+  mutate(infant_crc_saliva_time = ifelse(infant_crc_saliva_time > 00:00, "Collected", infant_crc_saliva_time))%>%
+  mutate(infant_crc_saliva_time=recode_factor(infant_crc_saliva_time,
+                                              .missing = "Not Collected"))
+
+# 12-Month CRC visit - Create new dataset 
+crc_12month_data=new_dat_2[grepl("^3", new_dat_2$mompostnat_crc_visit), ]
+
+# Save 12 month dataset
+crc_12month_data=crc_12month_data%>%
+  select(core_vars,
+         tables08_10_vars)
+
+# [X] mompostnat_crc_blood_time
+crc_12month_data=crc_12month_data%>%
+  mutate(mompostnat_crc_blood_time = ifelse(mompostnat_crc_blood_time > 00:00, "Collected", mompostnat_crc_blood_time))%>%
+  mutate(mompostnat_crc_blood_time=recode_factor(mompostnat_crc_blood_time,
+                                                 .missing = "Not Collected"))
+# [X] mompostnat_crc_urine_time
+crc_12month_data=crc_12month_data%>%
+  mutate(mompostnat_crc_urine_time = ifelse(mompostnat_crc_urine_time > 00:00, "Collected", mompostnat_crc_urine_time))%>%
+  mutate(mompostnat_crc_urine_time=recode_factor(mompostnat_crc_urine_time,
+                                                 .missing = "Not Collected"))
+# [X] mompostnat_crc_milk_time
+crc_12month_data=crc_12month_data%>%
+  mutate(mompostnat_crc_milk_time = ifelse(mompostnat_crc_milk_time > 00:00, "Collected", mompostnat_crc_milk_time))%>%
+  mutate(mompostnat_crc_milk_time=recode_factor(mompostnat_crc_milk_time,
+                                                .missing = "Not Collected"))
+# [X] mompostnat_crc_stool_time
+crc_12month_data=crc_12month_data%>%
+  mutate(mompostnat_crc_stool_time = ifelse(mompostnat_crc_stool_time > 00:00, "Collected", mompostnat_crc_stool_time))%>%
+  mutate(mompostnat_crc_stool_time=recode_factor(mompostnat_crc_stool_time,
+                                                 .missing = "Not Collected"))
+# [X] mompostnat_crc_saliva_time
+crc_12month_data=crc_12month_data%>%
+  mutate(mompostnat_crc_saliva_time = ifelse(mompostnat_crc_saliva_time > 00:00, "Collected", mompostnat_crc_saliva_time))%>%
+  mutate(mompostnat_crc_saliva_time=recode_factor(mompostnat_crc_saliva_time,
+                                                  .missing = "Not Collected"))
+# [X] infant_crc_urine_time
+crc_12month_data=crc_12month_data%>%
+  mutate(infant_crc_urine_time = ifelse(infant_crc_urine_time > 00:00, "Collected", infant_crc_urine_time))%>%
+  mutate(infant_crc_urine_time=recode_factor(infant_crc_urine_time,
+                                             .missing = "Not Collected"))
+# [X] infant_crc_blood_time
+crc_12month_data=crc_12month_data%>%
+  mutate(infant_crc_blood_time = ifelse(infant_crc_blood_time > 00:00, "Collected", infant_crc_blood_time))%>%
+  mutate(infant_crc_blood_time=recode_factor(infant_crc_blood_time,
+                                             .missing = "Not Collected"))
+# [X] infant_crc_stool_time
+crc_12month_data=crc_12month_data%>%
+  mutate(infant_crc_stool_time = ifelse(infant_crc_stool_time > 00:00, "Collected", infant_crc_stool_time))%>%
+  mutate(infant_crc_stool_time=recode_factor(infant_crc_stool_time,
+                                             .missing = "Not Collected"))
+# [X] infant_crc_saliva_time
+crc_12month_data=crc_12month_data%>%
+  mutate(infant_crc_saliva_time = ifelse(infant_crc_saliva_time > 00:00, "Collected", infant_crc_saliva_time))%>%
+  mutate(infant_crc_saliva_time=recode_factor(infant_crc_saliva_time,
+                                              .missing = "Not Collected"))
+
+### Table 11 - North Florida Medical Release Forms ###
+med_data=new_dat[grepl("North", new_dat$inv_delivery_location),]
+
+med_data=med_data%>%
+  mutate(beach_prenat_medrelease_pdf1=recode_factor(beach_prenat_medrelease_pdf1, "BLS001_Cardel_NorthFloridarelease_11September18.pdf" = "Yes", "BLS011_NorthFloridamedicalreleaseform_07November2018.pdf" = "Yes", "BLS013_medicalreleaseform_northflorida_15February2019.pdf" = "Yes", "BLS014A_12MO_northfloridamedicalrelease01May2019.pdf" = "Yes",
+"BLS036A_northfloridamedicalrelease_ 05September19.pdf" = "Yes",
+"BLS038A_northfloridamedicalreleaseform_18September19.pdf" = "Yes",
+"BLS044A_Duncan_northFloridarelease_10October18.pdf" = "Yes",
+"BLS045_Williams_NorthFloridarelease.7.24.19.pdf" = "Yes",
+"BLS055A_Allen_northfloridarelase_20December19.pdf" = "Yes",
+"	BLS056_Collins_NorthFLoridarelease_08October18.pdf" = "Yes",
+"BLS086A_NFmedicalreleaseform_09December19.pdf" = "Yes",
+"BLS056_Collins_NorthFLoridarelease_08October18.pdf" = "Yes",
+                                                    .missing="No"))
+  
+```
+
+```{r, echo=FALSE}
+
+# Save the data in your local laptop (Github path: /data)
+save(list=c("baseline_cleaned","Var_Ques"),file="~/BEACH-analysis/data/baseline_cleaned.RData")
+```

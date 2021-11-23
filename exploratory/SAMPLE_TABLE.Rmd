@@ -1,0 +1,106 @@
+---
+title: "BEACH Inventory- Baseline Table 1 -Basic Information"
+date: "`r format(Sys.time(), '%d %B, %Y, %H:%M')`"
+knit: (function(inputFile, encoding) { 
+      out_dir <- '~/BEACH-analysis/results/tables';
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=file.path(out_dir, 'BEACH Inventory - Basic Information.html')) })
+output: 
+ html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+
+---
+
+```{r, include=FALSE}
+##-------------- 
+# **************************************************************************** #
+# ***************                Project Overview              *************** #
+# **************************************************************************** #
+
+# Author:      Ke Xu  - modified by Hailey Ballard
+# Date:        Sept 24, 2020 
+# Modify:      January 29, 2021
+# IRB:         The Breastfeeding and EArly Child Health (BEACH) study (IRB201601034)
+
+# **************************************************************************** #
+# ***************                Description                   *************** #
+# **************************************************************************** #
+
+# PLAN: Generate Baseline Information
+
+# **************************************************************************** #
+# ***************                Library                       *************** #
+# **************************************************************************** #
+
+library(tidyverse)
+library(questionr)
+library(gtsummary)
+library(gt)
+library(labelled)
+```
+
+```{r setup, include=FALSE,message=FALSE,warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+#import survey data and codebook
+load("~/BEACH-analysis/data/baseline_cleaned.RData")
+```
+
+```{r, include=FALSE}
+##-------------- 
+# **************************************************************************** #
+# ***************         Table of Contents                    *************** #
+# **************************************************************************** #
+ 
+# Core Variables
+# [X] test_id 
+# [X] study_group (combined prepreg_bmi and inv_delivery_type)
+
+core_vars=c("test_id", "study_group")
+
+# Table 1 Prescreen 
+# [X] beach_prescreen_survey_complete
+# [X] phonescreen_followup_complete
+# [X] beach_part_consent
+# [X] participant_contact_information_complete
+ 
+table01_vars=c("beach_prescreen_survey_complete", "phonescreen_followup_complete", "beach_part_consent", "participant_contact_information_complete")
+
+```
+
+```{r, echo=FALSE}
+
+dat.1=baseline_cleaned%>%
+  select(core_vars, table01_vars, -test_id)%>%
+  as_tibble()
+
+```
+
+
+```{r, echo=FALSE}
+
+### Table labels
+
+dat_label=dat.1
+
+var_label(dat_label) <- list(beach_prescreen_survey_complete = "Completed Prescreen",
+                             phonescreen_followup_complete = "Completed Phonescreen Follow-Up",
+                             beach_part_consent = "Completed Consent",
+                             participant_contact_information_complete = "Complete Contact Info")
+```
+
+```{r, echo=FALSE}
+
+### Table generation
+
+theme_gtsummary_compact()
+dat_label %>% 
+  tbl_summary(by = study_group) %>% 
+  add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
+    as_gt() %>%
+  tab_header(title = "Table 01 - Baseline Information")
+```
