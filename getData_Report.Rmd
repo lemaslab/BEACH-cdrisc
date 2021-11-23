@@ -1,0 +1,71 @@
+---
+title: "01A - Get Report Data"
+author: "Hailey Ballard"
+date: "10/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+##-------------- 
+# **************************************************************************** #
+# ***************                Project Overview              *************** #
+# **************************************************************************** #
+# Author:      Hailey Ballard
+# Date:        October 21, 2021
+# IRB:         The Breastfeeding and EArly Child Health (BEACH) study (IRB201601034)
+#
+# version: R version 4.0.2 (2020-06-22)
+# version: Rstudio version Version 1.3.959 
+# **************************************************************************** #
+# ***************                Description                   *************** #
+# **************************************************************************** #
+# PLAN: Access redcap via API and pull/format/clean data for downstream analysis.
+# Note: vpn must be active
+```
+
+
+```{r, message=FALSE}
+# **************************************************************************** #
+# ***************                Library                       *************** #
+# **************************************************************************** #
+library(keyringr)
+library(redcapAPI)
+library(REDCapR)
+library(readxl)
+library(tidyverse)
+```
+
+```{r, message=FALSE}
+# Windows
+ source("~/BEACH-cdrisc/code/utils.R")
+ api_token=get_API_token("beach_api")
+```
+
+```{r, message=FALSE}
+# Mac, you need to store your API code in your keychain first
+# api_token <- decrypt_kc_pw("Redcap_BEACH_analysis")
+```
+
+```{r, message=FALSE}
+# API and URL
+uri='https://redcap.ctsi.ufl.edu/redcap/api/'
+rcon <- redcapConnection(url=uri, token=api_token)
+report_id <- 28452
+# Access data
+data_raw=redcap_report(
+  uri,
+  api_token,
+  report_id,
+  raw_or_label_headers="raw",
+  guess_type=FALSE)$data
+# Import the the master codebook
+#Var_Ques<-read_excel("~/BEACH-database/documents/beach_codebook_new.xlsx")
+#data_raw=data %>%
+#  as_tibble()
+# Save the data in your local laptop (Github path: /data)
+save(list=c("data_raw"),file="~/BEACH-cdrisc/data/raw/data_report_raw.RData")
+```
