@@ -1,0 +1,106 @@
+---
+title: "BEACH Inventory - Clean data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+##-------------- 
+# **************************************************************************** #
+# ***************                Project Overview              *************** #
+# **************************************************************************** #
+
+# Author:      Ke Xu - Modified by Hailey Ballard
+# Date:        Sept 28, 2020 
+# Modify:      Jan 29, 2021
+# IRB:         The Breastfeeding and EArly Child Health (BEACH) study (IRB201601034)
+
+# **************************************************************************** #
+# ***************                Description                   *************** #
+# **************************************************************************** #
+
+# PLAN: Clean data from imported RedCap records
+# **************************************************************************** #
+# ***************         Table of Contents                    *************** #
+# **************************************************************************** #
+
+# Core Variables
+# [X] test_id
+# [X] redcap_event_name
+# [X] mom3t_prepreg_bmi
+
+core_vars=c("test_id","redcap_event_name","bmi_analysis_prepregnant")
+
+# Table 1 Baseline Information
+# [X] cdrisc_score
+
+table01_vars=c("cdrisc_score")
+
+```
+
+```{r setup, include=FALSE,message=FALSE,warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+library(tidyverse)
+library(questionr)
+source("~/BEACH-cdrisc/code/variables.R")
+load("~/BEACH-cdrisc/data/raw/data_report_raw.RData")
+```
+
+```{r, echo=FALSE}
+
+new_dat_2=data_raw[grepl("^BLS", data_raw$test_id), ]
+
+new_dat=new_dat_2[grepl("^baseline", new_dat_2$redcap_event_name), ]
+
+
+# Collect pre-preg BMI
+bmi_dat=new_dat_2[grepl("^third", new_dat_2$redcap_event_name), ]
+
+bmi_dat=bmi_dat[grepl("^", bmi_dat$bmi_analysis_prepregnant), ]
+
+bmi_data_new=bmi_dat$bmi_analysis_prepregnant
+
+new_dat=new_dat%>%
+  mutate(prepreg_bmi=bmi_data_new)
+
+# Select data 
+new_dat=new_dat%>%
+  select(core_vars,
+         prepreg_bmi,
+         table01_vars)
+
+### Core Variables ###
+
+
+# [X] prepreg_bmi
+new_dat=new_dat%>%
+  mutate_at(vars(prepreg_bmi), function(x) case_when(
+                                     x == 1 ~ "NW",
+                                     x == 2 ~ "Overweight",
+                                     x == 3 ~ "OB"))
+
+new_dat=new_dat%>%
+  mutate()
+
+# Create BMI category
+bmi=new_dat$prepreg_bmi
+new_dat=new_dat%>%
+  mutate(bmi_data=bmi)
+
+# [X] redcap_event_name
+new_dat=new_dat%>%
+  mutate(redcap_event_name=recode_factor(redcap_event_name,
+                                     "Third_trimester" = "Third trimester",
+                                     "Two_week" = "Two week",
+                                     "Two_month" = "Two month"))
+
+new_dat=new_dat%>%
+  mutate()
+
+```
+
+```{r, echo=FALSE}
+
+# Save the data in your local laptop (Github path: /data)
+save(list=c("new_dat"),file="~/BEACH-cdrisc/data/Clean_Data.RData")
+```
