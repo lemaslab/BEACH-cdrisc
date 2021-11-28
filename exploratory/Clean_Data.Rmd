@@ -9,9 +9,9 @@ output: html_document
 # ***************                Project Overview              *************** #
 # **************************************************************************** #
 
-# Author:      Ke Xu - Modified by Hailey Ballard
+# Author:      Ke Xu - Modified by Hailey Ballard - Modified by Nisha Chachad
 # Date:        Sept 28, 2020 
-# Modify:      Jan 29, 2021
+# Modify:      Nov 28, 2021
 # IRB:         The Breastfeeding and EArly Child Health (BEACH) study (IRB201601034)
 
 # **************************************************************************** #
