@@ -60,7 +60,7 @@ load("~/BEACH-cdrisc/data/Clean_Data.RData")
 # Core Variables
 # [X] test_id 
 # [X] redcap_event_name
-# [X] mom3t_prepreg_bmi
+# [X] bmi_analysis_prepregnant
 
 core_vars=c("test_id","redcap_event_name","bmi_analysis_prepregnant")
 
@@ -73,7 +73,7 @@ table01_vars=c("cdrisc_score")
 
 ```{r, echo=FALSE}
 
-dat.1=new_dat%>%
+dat.1=data_raw%>%
   select(core_vars, table01_vars, -test_id)%>%
   as_tibble()
 
@@ -87,7 +87,7 @@ dat.1=new_dat%>%
 dat_label=dat.1
 
 var_label(dat_label) <- list(cdrisc_score = "Resilience Score",
-                             prepreg_bmi = "Pre-Pregnant BMI")
+                             redcap_event_name = "Study Visit")
 ```
 
 ```{r, echo=FALSE}
@@ -96,8 +96,11 @@ var_label(dat_label) <- list(cdrisc_score = "Resilience Score",
 
 theme_gtsummary_compact()
 dat_label %>% 
-  tbl_summary(by = redcap_event_name) %>% 
+  tbl_summary(by = bmi_analysis_prepregnant) %>% 
   add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
     as_gt() %>%
-  tab_header(title = "Table 01 - Overall Scores")
+  tab_header(title = "Table 01 - Average Resilience Score by BMI")
+
+# Have number of participants in each BMI group
+# Need to determine mean score for each study visit by BMI
 ```
