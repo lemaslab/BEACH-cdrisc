@@ -46,11 +46,6 @@ library(tidyverse)
 ```
 
 ```{r, message=FALSE}
-# Mac, you need to store your API code in your keychain first
-# api_token <- decrypt_kc_pw("Redcap_BEACH_analysis")
-```
-
-```{r, message=FALSE}
 # API and URL
 uri='https://redcap.ctsi.ufl.edu/redcap/api/'
 rcon <- redcapConnection(url=uri, token=api_token)
@@ -67,5 +62,5 @@ data_raw=redcap_report(
 #data_raw=data %>%
 #  as_tibble()
 # Save the data in your local laptop (Github path: /data)
-save(list=c("data_raw"),file="~/BEACH-cdrisc/data/raw/data_report_raw.RData")
+save(list=c("data_raw"),file="~/BEACH-cdrisc/data/data_report_raw.RData")
 ```
