@@ -1,5 +1,5 @@
 ---
-title: "04-Prenatal Health Conditions"
+title: "Pregnancy Complications"
 author: "Nisha Chachad"
 date: "3/26/2022"
 output: html_document
@@ -139,45 +139,69 @@ data_renamed=data_raw%>%
 data_sss=data_renamed%>%
   filter(redcap_event_name=="third_trimester_arm_1")
 
-# [X] mom3t_diabetes2
+# [X] mom3t_prenat_vagbleed
 data_sss=data_sss%>%
-  mutate(mom3t_diabetes2=recode_factor(mom3t_diabetes2,
+  mutate(mom3t_prenat_vagbleed=recode_factor(mom3t_prenat_vagbleed,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
 
-# [X] mom3t_high_bp
+# [X] mom3t_uti
 data_sss=data_sss%>%
-  mutate(mom3t_high_bp=recode_factor(mom3t_high_bp,
+  mutate(mom3t_uti=recode_factor(mom3t_uti,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
 
-# [X] mom3t_depression3
+# [X] mom3t_nausea
 data_sss=data_sss%>%
-  mutate(mom3t_depression3=recode_factor(mom3t_depression3,
+  mutate(mom3t_nausea=recode_factor(mom3t_nausea,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
-# [X] mom3t_pos
+# [X] mom3t_cervix
 data_sss=data_sss%>%
-  mutate(mom3t_pos=recode_factor(mom3t_pos,
+  mutate(mom3t_cervix=recode_factor(mom3t_cervix,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
-# [X] mom3t_ovarian
+# [X] mom3t_high_bp2
 data_sss=data_sss%>%
-  mutate(mom3t_ovarian=recode_factor(mom3t_ovarian,
+  mutate(mom3t_high_bp2=recode_factor(mom3t_high_bp2,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
-# [X] mom3t_std
+# [X] mom3t_placenta
 data_sss=data_sss%>%
-  mutate(mom3t_std=recode_factor(mom3t_std,
+  mutate(mom3t_placenta=recode_factor(mom3t_placenta,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
 
+# [X] mom3t_labor_pains
+data_sss=data_sss%>%
+  mutate(mom3t_labor_pains=recode_factor(mom3t_labor_pains,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+# [X] mom3t_water_broke
+data_sss=data_sss%>%
+  mutate(mom3t_water_broke=recode_factor(mom3t_water_broke,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+# [X] mom3t_blood_trans
+data_sss=data_sss%>%
+  mutate(mom3t_blood_trans=recode_factor(mom3t_blood_trans,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+# [X] mom3t_car_accident
+data_sss=data_sss%>%
+  mutate(mom3t_car_accident=recode_factor(mom3t_car_accident,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
 # [X] subsoc_where_america
 data_sss=data_sss%>%
   mutate(subsoc_where_america=recode_factor(subsoc_where_america, 
@@ -210,9 +234,9 @@ data_sss=data_sss%>%
 ```{r, include=FALSE}
 
 
-sss_america_vars=c("test_id", "subsoc_where_america", "mom3t_diabetes2", "mom3t_high_bp", "mom3t_depression3", "mom3t_pos", "mom3t_ovarian", "mom3t_std")
+sss_america_vars=c("test_id", "subsoc_where_america", "mom3t_prenat_vagbleed", "mom3t_uti", "mom3t_nausea", "mom3t_cervix", "mom3t_high_bp2", "mom3t_placenta", "mom3t_labor_pains", "mom3t_water_broke", "mom3t_blood_trans", "mom3t_car_accident")
 
-sss_community_vars=c("test_id", "subsoc_where_community", "mom3t_diabetes2", "mom3t_high_bp", "mom3t_depression3", "mom3t_pos", "mom3t_ovarian", "mom3t_std")
+sss_community_vars=c("test_id", "subsoc_where_community", "mom3t_prenat_vagbleed", "mom3t_uti", "mom3t_nausea", "mom3t_cervix", "mom3t_high_bp2", "mom3t_placenta", "mom3t_labor_pains", "mom3t_water_broke", "mom3t_blood_trans", "mom3t_car_accident")
 
 ```
 
@@ -231,12 +255,16 @@ dat.1=data_sss%>%
 
 dat_label=dat.1
 
-var_label(dat_label) <- list(mom3t_diabetes2 = "Type 1 or type 2 diabetes",
-                             mom3t_high_bp = "High blood pressure",
-                             mom3t_depression3 = "Depression",
-                             mom3t_pos = "Polycystic Ovarian Syndrome (POS)",
-                             mom3t_ovarian = "Primary ovarian insufficiency, endometriosis, uterine fibroids",
-                             mom3t_std = "Sexually transmitted infection"
+var_label(dat_label) <- list(mom3t_prenat_vagbleed = "Vaginal bleeding",
+                             mom3t_uti = "Kidney or bladder (urinary tract) infection (UTI)",
+                             mom3t_nausea = "Severe nausea, vomiting, or dehydration that sent you to the doctor or hospital",
+                             mom3t_cervix = "Cervix had to be sewn shut (cerclage for incompetent cervix)",
+                             mom3t_high_bp2 = "High blood pressure, hypertension (including pregnancy-induced hypertension [PHI]), preeclampsia, or toxemia",
+                             mom3t_placenta = "Problems with the placenta (such as abruption placentae or placenta previa)",
+                             mom3t_labor_pains = "Labor pains more than 2 weeks before my baby was due",
+                             mom3t_water_broke = "Water broke more than 3 weeks before my baby was due (premature rupture of membranes [PROM])",
+                             mom3t_blood_trans = "I had to have a blood transfusion",
+                             mom3t_car_accident = "I was hurt in a car accident"
                               )
 ```
 
@@ -252,8 +280,6 @@ dat_label %>%
   tab_header(title = "Table 01 - American Society SSS Effect on Prenatal Health Conditions")
 
 ```
-
-
 ```{r, include=FALSE}
 
 dat.2=data_sss%>%
@@ -269,12 +295,16 @@ dat.2=data_sss%>%
 
 dat_label=dat.2
 
-var_label(dat_label) <- list(mom3t_diabetes2 = "Type 1 or type 2 diabetes",
-                             mom3t_high_bp = "High blood pressure",
-                             mom3t_depression3 = "Depression",
-                             mom3t_pos = "Polycystic Ovarian Syndrome (POS)",
-                             mom3t_ovarian = "Primary ovarian insufficiency, endometriosis, uterine fibroids",
-                             mom3t_std = "Sexually transmitted infection"
+var_label(dat_label) <- list(mom3t_prenat_vagbleed = "Vaginal bleeding",
+                             mom3t_uti = "Kidney or bladder (urinary tract) infection (UTI)",
+                             mom3t_nausea = "Severe nausea, vomiting, or dehydration that sent you to the doctor or hospital",
+                             mom3t_cervix = "Cervix had to be sewn shut (cerclage for incompetent cervix)",
+                             mom3t_high_bp2 = "High blood pressure, hypertension (including pregnancy-induced hypertension [PHI]), preeclampsia, or toxemia",
+                             mom3t_placenta = "Problems with the placenta (such as abruption placentae or placenta previa)",
+                             mom3t_labor_pains = "Labor pains more than 2 weeks before my baby was due",
+                             mom3t_water_broke = "Water broke more than 3 weeks before my baby was due (premature rupture of membranes [PROM])",
+                             mom3t_blood_trans = "I had to have a blood transfusion",
+                             mom3t_car_accident = "I was hurt in a car accident"
                               )
 ```
 

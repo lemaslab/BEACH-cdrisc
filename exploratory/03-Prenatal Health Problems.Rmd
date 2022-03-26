@@ -249,7 +249,7 @@ dat_label %>%
   tbl_summary(by = subsoc_where_america) %>% 
   add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
     as_gt() %>%
-  tab_header(title = "Table 01 - Country SSS Effect on Clinical Outcomes")
+  tab_header(title = "Table 01 - American Society SSS Effect on Clinical Outcomes")
 
 ```
 
