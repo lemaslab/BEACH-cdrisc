@@ -1,7 +1,7 @@
 ---
-title: "02- Clean Data"
-author: "Hailey Ballard"
-date: "03/17/2022"
+title: "Prenatal Care Access"
+author: "Nisha Chachad"
+date: "3/26/2022"
 output: html_document
 ---
 
@@ -14,8 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 # **************************************************************************** #
 # ***************                Project Overview              *************** #
 # **************************************************************************** #
-# Author:      Hailey Ballard
-# Date:        October 21, 2021
+# Author:      Nisha Chachad
+# Date:        March 26, 2022
 # IRB:         The Breastfeeding and EArly Child Health (BEACH) study (IRB201601034)
 #
 # version: R version 4.0.2 (2020-06-22)
@@ -139,41 +139,54 @@ data_renamed=data_raw%>%
 data_sss=data_renamed%>%
   filter(redcap_event_name=="third_trimester_arm_1")
 
-# [X] mom3t_asthma_3mo
+# [X] mom3t_diet
 data_sss=data_sss%>%
-  mutate(mom3t_asthma_3mo=recode_factor(mom3t_asthma_3mo,
+  mutate(mom3t_diet=recode_factor(mom3t_diet,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
 
-# [X] mom3t_anemia_3mo
+# [X] mom3t_exercise
 data_sss=data_sss%>%
-  mutate(mom3t_anemia_3mo=recode_factor(mom3t_anemia_3mo,
+  mutate(mom3t_exercise=recode_factor(mom3t_exercise,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
 
-# [X] mom3t_heart_3mo
+# [X] mom3t_meds_regular
 data_sss=data_sss%>%
-  mutate(mom3t_heart_3mo=recode_factor(mom3t_heart_3mo,
+  mutate(mom3t_meds_regular=recode_factor(mom3t_meds_regular,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
-# [X] mom3t_epilepsy_3mo
+# [X] mom3t_diabetes
 data_sss=data_sss%>%
-  mutate(mom3t_epilepsy_3mo=recode_factor(mom3t_epilepsy_3mo,
+  mutate(mom3t_diabetes=recode_factor(mom3t_diabetes,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
-# [X] mom3t_thyroid_3mo
+# [X] mom3t_bp
 data_sss=data_sss%>%
-  mutate(mom3t_thyroid_3mo=recode_factor(mom3t_thyroid_3mo,
+  mutate(mom3t_bp=recode_factor(mom3t_bp,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
-# [X] mom3t_anxiety_3mo
+# [X] mom3t_depression
 data_sss=data_sss%>%
-  mutate(mom3t_anxiety_3mo=recode_factor(mom3t_anxiety_3mo,
+  mutate(mom3t_depression=recode_factor(mom3t_depression,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+
+# [X] mom3t_med_hx
+data_sss=data_sss%>%
+  mutate(mom3t_med_hx=recode_factor(mom3t_med_hx,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+# [X] mom3t_dental
+data_sss=data_sss%>%
+  mutate(mom3t_dental=recode_factor(mom3t_dental,
                                         "1" = "Yes ",
                                         "2" = "No "
                                         ))
@@ -210,9 +223,9 @@ data_sss=data_sss%>%
 ```{r, include=FALSE}
 
 
-sss_america_vars=c("test_id", "subsoc_where_america", "mom3t_asthma_3mo", "mom3t_anemia_3mo", "mom3t_heart_3mo", "mom3t_epilepsy_3mo", "mom3t_thyroid_3mo", "mom3t_anxiety_3mo")
+sss_america_vars=c("test_id", "subsoc_where_america", "mom3t_diet", "mom3t_exercise", "mom3t_meds_regular", "mom3t_diabetes", "mom3t_bp", "mom3t_depression", "mom3t_med_hx", "mom3t_dental")
 
-sss_community_vars=c("test_id", "subsoc_where_community", "mom3t_asthma_3mo", "mom3t_anemia_3mo", "mom3t_heart_3mo", "mom3t_epilepsy_3mo", "mom3t_thyroid_3mo", "mom3t_anxiety_3mo")
+sss_community_vars=c("test_id", "subsoc_where_community", "mom3t_diet", "mom3t_exercise", "mom3t_meds_regular", "mom3t_diabetes", "mom3t_bp", "mom3t_depression", "mom3t_med_hx", "mom3t_dental")
 
 ```
 
@@ -231,12 +244,14 @@ dat.1=data_sss%>%
 
 dat_label=dat.1
 
-var_label(dat_label) <- list(mom3t_asthma_3mo = "Asthma",
-                             mom3t_anemia_3mo = "Anemia",
-                             mom3t_heart_3mo = "Heart Issues",
-                             mom3t_epilepsy_3mo = "Epilepsy (Seizures)",
-                             mom3t_thyroid_3mo = "Thyroid problems",
-                             mom3t_anxiety_3mo = "Anxiety"
+var_label(dat_label) <- list(mom3t_diet = "I was dieting (changing my eating habits) to lose weight",
+                             mom3t_exercise = "I was exercising 3 or more days of the week",
+                             mom3t_meds_regular = "I was regularly taking prescription medicines other than birth control",
+                             mom3t_diabetes = "I visited a health care worker and was checked for diabetes",
+                             mom3t_bp = "I visited a health care worker and was checked for high blood pressure",
+                             mom3t_depression = "I visited a health care worker and was checked for depression or anxiety",
+                             mom3t_med_hx = "I talked to a health care worker about my family medical history",
+                             mom3t_dental = "I had my teeth cleaned by a dentist or dental hygienist"
                               )
 ```
 
@@ -249,11 +264,9 @@ dat_label %>%
   tbl_summary(by = subsoc_where_america) %>% 
   add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
     as_gt() %>%
-  tab_header(title = "Table 01 - American Society SSS Effect on Clinical Outcomes")
+  tab_header(title = "Table 01 - American Society SSS Effect on Prenatal Care Access")
 
 ```
-
-
 ```{r, include=FALSE}
 
 dat.2=data_sss%>%
@@ -269,12 +282,14 @@ dat.2=data_sss%>%
 
 dat_label=dat.2
 
-var_label(dat_label) <- list(mom3t_asthma_3mo = "Asthma",
-                             mom3t_anemia_3mo = "Anemia",
-                             mom3t_heart_3mo = "Heart Issues",
-                             mom3t_epilepsy_3mo = "Epilepsy (Seizures)",
-                             mom3t_thyroid_3mo = "Thyroid problems",
-                             mom3t_anxiety_3mo = "Anxiety"
+var_label(dat_label) <- list(mom3t_diet = "I was dieting (changing my eating habits) to lose weight",
+                             mom3t_exercise = "I was exercising 3 or more days of the week",
+                             mom3t_meds_regular = "I was regularly taking prescription medicines other than birth control",
+                             mom3t_diabetes = "I visited a health care worker and was checked for diabetes",
+                             mom3t_bp = "I visited a health care worker and was checked for high blood pressure",
+                             mom3t_depression = "I visited a health care worker and was checked for depression or anxiety",
+                             mom3t_med_hx = "I talked to a health care worker about my family medical history",
+                             mom3t_dental = "I had my teeth cleaned by a dentist or dental hygienist"
                               )
 ```
 
@@ -287,6 +302,6 @@ dat_label %>%
   tbl_summary(by = subsoc_where_community) %>% 
   add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
     as_gt() %>%
-  tab_header(title = "Table 02 - Community SSS Effect on Clinical Outcomes")
+  tab_header(title = "Table 02 - Community SSS Effect on Prenatal Care Access")
 
 ```

@@ -283,6 +283,7 @@ var_label(dat_label) <- list(mom3t_diabetes2 = "Type 1 or type 2 diabetes",
 ### Table generation
 
 theme_gtsummary_compact()
+dat_label %>% 
   tbl_summary(by = subsoc_where_community) %>% 
   add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
     as_gt() %>%

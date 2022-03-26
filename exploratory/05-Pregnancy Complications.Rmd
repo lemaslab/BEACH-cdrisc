@@ -277,7 +277,7 @@ dat_label %>%
   tbl_summary(by = subsoc_where_america) %>% 
   add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
     as_gt() %>%
-  tab_header(title = "Table 01 - American Society SSS Effect on Prenatal Health Conditions")
+  tab_header(title = "Table 01 - American Society SSS Effect on Pregnancy Complications")
 
 ```
 ```{r, include=FALSE}
@@ -313,9 +313,10 @@ var_label(dat_label) <- list(mom3t_prenat_vagbleed = "Vaginal bleeding",
 ### Table generation
 
 theme_gtsummary_compact()
+dat_label %>% 
   tbl_summary(by = subsoc_where_community) %>% 
   add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
     as_gt() %>%
-  tab_header(title = "Table 02 - Community SSS Effect on Prenatal Health Conditions")
+  tab_header(title = "Table 02 - Community SSS Effect on Pregnancy Complications")
 
 ```
