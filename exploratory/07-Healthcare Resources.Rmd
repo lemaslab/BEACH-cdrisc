@@ -143,76 +143,88 @@ data_sss=data_renamed%>%
 data_sss=data_sss%>%
   mutate(mom3t_folic=recode_factor(mom3t_folic,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 
 # [X] mom3t_healthy_wt
 data_sss=data_sss%>%
   mutate(mom3t_healthy_wt=recode_factor(mom3t_healthy_wt,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 
 # [X] mom3t_vaccine
 data_sss=data_sss%>%
   mutate(mom3t_vaccine=recode_factor(mom3t_vaccine,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 # [X] mom3t_dentist
 data_sss=data_sss%>%
   mutate(mom3t_dentist=recode_factor(mom3t_dentist,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 # [X] mom3t_genetics
 data_sss=data_sss%>%
   mutate(mom3t_genetics=recode_factor(mom3t_genetics,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 # [X] mom3t_medical_ctrl
 data_sss=data_sss%>%
   mutate(mom3t_medical_ctrl=recode_factor(mom3t_medical_ctrl,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 
 # [X] mom3t_depression2
 data_sss=data_sss%>%
   mutate(mom3t_depression2=recode_factor(mom3t_depression2,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 # [X] mom3t_infertility
 data_sss=data_sss%>%
   mutate(mom3t_infertility=recode_factor(mom3t_infertility,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 # [X] mom3t_rx_safety
 data_sss=data_sss%>%
   mutate(mom3t_rx_safety=recode_factor(mom3t_rx_safety,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 # [X] mom3t_smoke
 data_sss=data_sss%>%
   mutate(mom3t_smoke=recode_factor(mom3t_smoke,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 # [X] mom3t_alcohol	
 data_sss=data_sss%>%
   mutate(mom3t_alcohol=recode_factor(mom3t_alcohol,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 # [X] mom3t_drugs
 data_sss=data_sss%>%
   mutate(mom3t_drugs=recode_factor(mom3t_drugs,
                                         "1" = "Yes ",
-                                        "2" = "No "
+                                        "2" = "No ",
+                                        "3" = "Not applicable"
                                         ))
 # [X] subsoc_where_america
 data_sss=data_sss%>%
