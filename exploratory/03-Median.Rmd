@@ -1,0 +1,292 @@
+---
+title: "03-Median"
+author: "Nisha Chachad"
+date: "4/26/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+##-------------- 
+# **************************************************************************** #
+# ***************                Project Overview              *************** #
+# **************************************************************************** #
+# Author:      Hailey Ballard
+# Date:        October 21, 2021
+# IRB:         The Breastfeeding and EArly Child Health (BEACH) study (IRB201601034)
+#
+# version: R version 4.0.2 (2020-06-22)
+# version: Rstudio version Version 1.3.959 
+# **************************************************************************** #
+# ***************                Description                   *************** #
+# **************************************************************************** #
+# PLAN: Access redcap via API and pull/format/clean data for downstream analysis.
+# Note: vpn must be active
+```
+
+
+```{r, message=FALSE}
+# **************************************************************************** #
+# ***************                Library                       *************** #
+# **************************************************************************** #
+library(keyringr)
+library(redcapAPI)
+library(REDCapR)
+library(readxl)
+library(tidyverse)
+library(questionr)
+library(gtsummary)
+library(gt)
+library(labelled)
+
+```
+
+```{r, message=FALSE}
+# Windows
+load("~/BEACH-cdrisc/data/data_report_raw.RData")
+ 
+```
+
+```{r, include=FALSE}
+
+data_renamed=data_raw%>%
+  mutate(test_id=recode_factor(test_id,
+                               "5cd62532c5860ad5ae930c4d66aa7103" = "BLS001A",
+                               "9eaca4c21b7027f82c3ea3216de202c6" = "BLS002A", 
+                               "5135d8da76f109960f25b0a98c02f3d3" = "BLS003A",
+                               "550484983d380a3266a4f3253e641e51" = "BLS006A",
+                               "fd3eedff8eb3197967cca268e5650286" = "BLS007A",
+                               "d451ce06f2d3ff4430fab13b557eb242" = "BLS008A",
+                               "6a8770d00215d8b519c12d66d0a626da" = "BLS010A",
+                               "9ab33de56ee51c603c18c37994917ab9" = "BLS011A",
+                               "a108ac4c7dc275ec400d2ff4176cb7e9" = "BLS012A", 
+                               "10c3ef15a907313f2c28bf579780ca80" = "BLS013A",
+                               "37e97927e1db6223115cc978ee62ad4f" = "BLS014A", 
+                               "3bcd8c1994fde23f41637534bfa188a1" = "BLS015A",
+                               "ab9e9d61855850ebea1ba94c8533f529" = "BLS016A",
+                               "6191959b40cea158bc2b52f25140e72b" = "BLS019A",
+                               "33f438af421d2e3c1022f6573563e962" = "BLS020A",
+                               "26d83268e5a9a43fb22a506df8a990a0" = "BLS023A",
+                               "6ad2fd27c069a970441b6b3e723e9053" = "BLS025A",
+                               "dad12ef2c64867de9e46c21e5c24dd84" = "BLS026A",
+                               "1e8f27eba67004b633ae3f68eb1d127b" = "BLS027A",
+                               "17a4506df689e0dd2d536f1f9736154c" = "BLS028A",
+                               "b74be56f2ffd99cf29b08aa6e1338a97" = "BLS029A",
+                               "4e175d086a6fd9aecf8284a2ab25b55d" = "BLS030A",
+                               "c14e77ccc45d397b05e3960088bf189d" = "BLS032A",
+                               "13f93c2d50e582a4dc65c37bc67aaac6" = "BLS033A",
+                               "670edaf9958dd922c69599b8a6fc75c0" = "BLS034A", 
+                               "6e51eadc2d6c58d75c4de068fbd5edac" = "BLS035A",
+                               "32eb197029fb700d8dbe96ddd48d9be6" = "BLS036A",
+                               "5063e3243242629f5495bc16a130b42b" = "BLS037A",
+                               "0172ac8d540a7921e7681eb4ca8d2ad6" = "BLS038A",
+                               "0936e86ee72ddec4ff976af67535a53d" = "BLS039A",
+                               "9487a9bca20152d098c13a896b105cbb" = "BLS040A",
+                               "e91eb172daf3519e2faee65c46fe271e" = "BLS041A",
+                               "a89cb845786922530c3c3bb08d099ce7" = "BLS043A",
+                               "6ff57b968975efb9d883dac438a2ff13" = "BLS044A",
+                               "e34690d305ed0ebe0eea23a45c3a648a" = "BLS045A", 
+                               "fdb6c93c40020a34ed271c256d861609" = "BLS048A",
+                               "47b63aa97837feab1fd8f731b18a9ca0" = "BLS049A",
+                               "a8c9768ffd45019eb74dc6572c9d6db8" = "BLS050A",
+                               "f4f61d8646c8cc5648daa2af715baa72" = "BLS051A",
+                               "55b9a3cc3e501b303fb228f1c0cc572e" = "BLS052A", 
+                               "94ddd968afba8b693c9270209eb57db6" = "BLS053A", 
+                               "fd0c4efa5d521d46f758821629a5b6e2" = "BLS054A",
+                               "07f8356db14469b82abd8bac0c86f005" = "BLS055A",
+                               "3a0c74f69d1e067d60c61c88b6741a8c" = "BLS056A", 
+                               "f3cfd2d3ff5acf7b67e5050d33edaf43" = "BLS057A",
+                               "d199921d3e20e263259c5865d65f21dc" = "BLS058A",
+                               "d535b5b5af1f9e06c0dc38415ae052c5" = "BLS059A",
+                               "218e8e0c4e14aacb320785b0aadf8cd5" = "BLS060A",
+                               "243ec00c0b7354e06d834654b5eb63cc" = "BLS062A",
+                               "bb191b32267b84be8064f6caa2d0d12c" = "BLS063A",
+                               "9b45af30b61d043c9e7c032311f77df0" = "BLS064A",
+                               "d66c2a215fc799de47123cd13e77705d" = "BLS065A",
+                               "d6bfbcc3810812d56b7f2924dea548d0" = "BLS066A",
+                               "a66b9b17454a199a3b6e51fe6fccf64b" = "BLS068A",
+                               "0726be44c3258d3451212c538530ecd6" = "BLS070A",
+                               "67646449edf1f5072eaccb81ca0a3a93" = "BLS073A",
+                               "ccf18d8ba8d81d46acf3f5fb22d2806d" = "BLS074A",
+                               "2f3ea3444260ce7d79eb6028e6e8de02" = "BLS075A",
+                               "e685a77e20522ad69a830dd06bf88890" = "BLS078A",
+                               "01f2d10645f0b8ef469888c109b896b0" = "BLS079A",
+                               "51d2faca749512884e2251e2ff2a2aed" = "BLS081A",
+                               "5ec31345014271d84f443e8f6ea18485" = "BLS083A",
+                               "2504e89a5678aa1d22f46fed5c69e3b3" = "BLS084A",
+                               "9f1e45a75e5f1d61089d4383ad42d20e" = "BLS086A",
+                               "3d030ddf3d418aeb013d53e87c7494ba" = "BLS088A",
+                               "9c4b80ff16ba57d1337c186a391f1822" = "BLS090A",
+                               "fc9b61f56153183e3ef2d1aa524eb8ce" = "BLS094A",
+                               "804077a087dde48d5d42dd92d5e2ca34" = "BLS097A",
+                               "85ceffcc00ce8ce392bba57c77aec0db" = "BLS098A",
+                               "ac73ad4670f09ccb7980610fc85509c4" = "BLS099A",
+                               "eac89f58b4308fa7bfb917bce9ef963e" = "BLS100A",
+                               "9f05b5812286f5c05874df994209bfa1" = "BLS101A",
+                               "f7f86e5219a100e068f2ccae50b3a5ba" = "BLS103A",
+                               "bedb398648cfddb61df4f5bd345dfaaf" = "BLS104A",
+                               "db9195fc7c5680e25dc0b2568d6362c2" = "BLS110A",
+                               "ed2c9c89e4fb118a2074d06196910b86" = "BLS111A",
+                               "f1908b47c8a3129204aa1eef59aa2262" = "BLS112A",
+                               "ffca8bb7311feb94cd4c2e97a1d498b5" = "BLS113A",
+                               "71c3ec8a47d3c95a61ae105b43b1015f" = "BLS114A",
+                               "85ddbd3b114fbd5c65d868845ca5c6b5" = "BLS115A"
+                               ))
+#Group data for SSS Tables
+data_sss=data_renamed%>%
+  filter(redcap_event_name=="third_trimester_arm_1")
+
+# [X] mom3t_asthma_3mo
+data_sss=data_sss%>%
+  mutate(mom3t_asthma_3mo=recode_factor(mom3t_asthma_3mo,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+
+# [X] mom3t_anemia_3mo
+data_sss=data_sss%>%
+  mutate(mom3t_anemia_3mo=recode_factor(mom3t_anemia_3mo,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+
+# [X] mom3t_heart_3mo
+data_sss=data_sss%>%
+  mutate(mom3t_heart_3mo=recode_factor(mom3t_heart_3mo,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+# [X] mom3t_epilepsy_3mo
+data_sss=data_sss%>%
+  mutate(mom3t_epilepsy_3mo=recode_factor(mom3t_epilepsy_3mo,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+# [X] mom3t_thyroid_3mo
+data_sss=data_sss%>%
+  mutate(mom3t_thyroid_3mo=recode_factor(mom3t_thyroid_3mo,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+# [X] mom3t_anxiety_3mo
+data_sss=data_sss%>%
+  mutate(mom3t_anxiety_3mo=recode_factor(mom3t_anxiety_3mo,
+                                        "1" = "Yes ",
+                                        "2" = "No "
+                                        ))
+
+# [X] subsoc_where_america
+data_sss=data_sss%>%
+  mutate(subsoc_where_america=recode_factor(subsoc_where_america, 
+                                            "1" = "Low",
+                                            "2" = "Low",
+                                            "3" = "Low",
+                                            "4" = "Low",
+                                            "5" = "Low",
+                                            "6" = "Low",
+                                            "7" = "High",
+                                            "8" = "High",
+                                            "9" = "High",
+                                            "10" = "High"))
+# [X] subsoc_where_community
+data_sss=data_sss%>%
+  mutate(subsoc_where_community=recode_factor(subsoc_where_community, 
+                                            "1" = "Low",
+                                            "2" = "Low",
+                                            "3" = "Low",
+                                            "4" = "Low",
+                                            "5" = "Low",
+                                            "6" = "Low",
+                                            "7" = "High",
+                                            "8" = "High",
+                                            "9" = "High",
+                                            "10" = "High"))
+
+```
+
+```{r, include=FALSE}
+
+
+sss_america_vars=c("test_id", "subsoc_where_america", "mom3t_asthma_3mo", "mom3t_anemia_3mo", "mom3t_heart_3mo", "mom3t_epilepsy_3mo", "mom3t_thyroid_3mo", "mom3t_anxiety_3mo")
+
+sss_community_vars=c("test_id", "subsoc_where_community", "mom3t_asthma_3mo", "mom3t_anemia_3mo", "mom3t_heart_3mo", "mom3t_epilepsy_3mo", "mom3t_thyroid_3mo", "mom3t_anxiety_3mo")
+
+```
+
+```{r, include=FALSE}
+
+dat.1=data_sss%>%
+  select(sss_america_vars, -test_id)%>%
+  as_tibble()
+
+```
+
+
+```{r, include=FALSE}
+
+### Table labels
+
+dat_label=dat.1
+
+var_label(dat_label) <- list(mom3t_asthma_3mo = "Asthma",
+                             mom3t_anemia_3mo = "Anemia",
+                             mom3t_heart_3mo = "Heart Issues",
+                             mom3t_epilepsy_3mo = "Epilepsy (Seizures)",
+                             mom3t_thyroid_3mo = "Thyroid problems",
+                             mom3t_anxiety_3mo = "Anxiety"
+                              )
+```
+
+```{r, echo=FALSE}
+ 
+### Table generation
+
+theme_gtsummary_compact()
+dat_label %>% 
+  tbl_summary(by = subsoc_where_america) %>% 
+  add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
+    as_gt() %>%
+  tab_header(title = "Table 01 - American Society SSS Effect on Clinical Outcomes")
+
+```
+
+
+```{r, include=FALSE}
+
+dat.2=data_sss%>%
+  select(sss_community_vars, -test_id)%>%
+  as_tibble()
+
+```
+
+
+```{r, include=FALSE}
+
+### Table labels
+
+dat_label=dat.2
+
+var_label(dat_label) <- list(mom3t_asthma_3mo = "Asthma",
+                             mom3t_anemia_3mo = "Anemia",
+                             mom3t_heart_3mo = "Heart Issues",
+                             mom3t_epilepsy_3mo = "Epilepsy (Seizures)",
+                             mom3t_thyroid_3mo = "Thyroid problems",
+                             mom3t_anxiety_3mo = "Anxiety"
+                              )
+```
+
+```{r, echo=FALSE}
+ 
+### Table generation
+
+theme_gtsummary_compact()
+dat_label %>% 
+  tbl_summary(by = subsoc_where_community) %>% 
+  add_overall() %>% add_p(pvalue_fun = function(x)style_pvalue(x,digits = 3)) %>%
+    as_gt() %>%
+  tab_header(title = "Table 02 - Community SSS Effect on Clinical Outcomes")
+
+```
